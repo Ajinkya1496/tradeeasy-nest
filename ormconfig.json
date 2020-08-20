@@ -1,0 +1,10 @@
+{
+    "type": "postgres",
+    "host": "drona.db.elephantsql.com",
+    "port": 5432,
+    "username": "ijcsyvfk",
+    "password": "dyKIP6fjEaAU8dH4nao4ppuGI_uGqPZp",
+    "database": "ijcsyvfk",
+    "entities": ["dist/**/*.entity{.ts,.js}"],
+    "synchronize": false
+}
