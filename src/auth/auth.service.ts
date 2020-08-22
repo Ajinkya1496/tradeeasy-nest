@@ -1,6 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
+import bcrypt = require('bcrypt');
+import { User } from 'src/user/user.entity';
+import { TradeeasyConstants } from 'src/tradeeasy.constants';
 
 @Injectable()
 export class AuthService {
@@ -9,20 +12,18 @@ export class AuthService {
         private jwtService: JwtService,
     ) {}
 
-    async validateUser(username: string, password: string): Promise<any> {
-        // ToDo write own validation logic
-        // const user = await this.userService.findOne(username);
-        // if (user && user.password === pass) {
-        //   const { password, ...result } = user;
-        //   return result;
-        // }
-        // return null;
+    async validateUser(email: string, password: string): Promise<any> {
+        const user = await this.userService.findOne(email);
+        if (user && bcrypt.compareSync(password, user.hash)) {
+          return await this.login(user);
+        }
+        throw new HttpException(TradeeasyConstants.ERROR_MESSAGES.INVALID_USERNAME, HttpStatus.UNAUTHORIZED);
       }
 
-    async login(user: any) {
-        const payload = { username: user.username, sub: user.userId };
+    async login(user: User) {
+        const payload = { username: user.email, sub: user.id, name: `${user.first_name} ${user.last_name}` };
         return {
-            access_token: this.jwtService.sign(payload),
+            accessToken: this.jwtService.sign(payload),
         };
     }
 }
